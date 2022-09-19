@@ -9,7 +9,7 @@ import javax.ws.rs.core.Cookie;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
-import com.mybank.dto.ClienteDTO;
+import com.mybank.dto.CreateClienteDTO;
 import com.mybank.exception.BusinessException;
 import com.mybank.exception.SecurityException;
 import com.mybank.model.Cliente;
@@ -27,7 +27,7 @@ public class ClienteService {
 
     private final String jwtSecret = "KiTHOH4xtiVowIBGN+XXZi0ZYwTVWXZkUDhCRtQMstU=";
 
-    public void createCliente(ClienteDTO clienteData) {
+    public void createCliente(CreateClienteDTO clienteData) {
         validateCreateCliente(clienteData);
 
         Cliente cliente = new Cliente();
@@ -38,7 +38,7 @@ public class ClienteService {
         cliente.persistAndFlush();
     }
 
-    private void validateCreateCliente(ClienteDTO clienteData) {
+    private void validateCreateCliente(CreateClienteDTO clienteData) {
         if (clienteData.cpf == null || clienteData.cpf.isBlank()) {
             throw new BusinessException(1, "CPF é obrigatório");
         }

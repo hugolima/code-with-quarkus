@@ -11,7 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 
-import com.mybank.dto.ClienteDTO;
+import com.mybank.dto.CreateClienteDTO;
 import com.mybank.dto.ClienteInfoDTO;
 import com.mybank.model.Cliente;
 import com.mybank.service.ClienteService;
@@ -25,7 +25,7 @@ public class ClienteController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
-    public void createClient(ClienteDTO clienteData) {
+    public void createClient(CreateClienteDTO clienteData) {
         clienteService.createCliente(clienteData);
     }
 

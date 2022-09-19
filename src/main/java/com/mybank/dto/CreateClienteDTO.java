@@ -1,6 +1,6 @@
 package com.mybank.dto;
 
-public class ClienteDTO {
+public class CreateClienteDTO {
 
     public String cpf;
     public String nome;
