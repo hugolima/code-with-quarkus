@@ -1,7 +1,5 @@
 package com.mybank.controller;
 
-import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
-
 import java.net.URISyntaxException;
 
 import javax.inject.Inject;
@@ -16,19 +14,16 @@ import com.mybank.service.ClienteService;
 
 @Path("/login")
 public class LoginController {
-	
-	@Inject
-	private ClienteService clienteService;
-	
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response login(LoginDTO loginData) throws URISyntaxException {
-		String jwt = clienteService.createJWTTokenForLogin(loginData.cpf, loginData.senha);
-		if (jwt != null) {
-			return Response.ok()
-					.header("Set-Cookie", "jwt=" + jwt + "; SameSite=strict; HttpOnly")
-					.build();
-		}
-		return Response.status(UNAUTHORIZED).build();
-	}
+
+    @Inject
+    protected ClienteService clienteService;
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response login(LoginDTO loginData) throws URISyntaxException {
+        String jwt = clienteService.createJWTTokenForLogin(loginData.cpf, loginData.senha);
+        return Response.ok()
+                .header("Set-Cookie", "jwt=" + jwt + "; SameSite=strict; HttpOnly")
+                .build();
+    }
 }
