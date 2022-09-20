@@ -13,13 +13,10 @@ import com.mybank.model.Cliente;
 import com.mybank.util.ClienteDatabaseUtil;
 
 import io.quarkus.test.TestTransaction;
-import io.quarkus.test.common.QuarkusTestResource;
-import io.quarkus.test.h2.H2DatabaseTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 
 @QuarkusTest
-@QuarkusTestResource(H2DatabaseTestResource.class)
 public class ClienteControllerTest {
     
     private final String CPF = "11111111111";
