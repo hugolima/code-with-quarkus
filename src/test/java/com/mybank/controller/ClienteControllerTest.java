@@ -2,15 +2,23 @@ package com.mybank.controller;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 
 import com.mybank.dto.CreateClienteDTO;
+import com.mybank.model.Cliente;
+import com.mybank.util.ClienteDatabaseUtil;
 
+import io.quarkus.test.TestTransaction;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.h2.H2DatabaseTestResource;
+import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 
+@QuarkusTest
 @QuarkusTestResource(H2DatabaseTestResource.class)
 public class ClienteControllerTest {
     
@@ -18,8 +26,8 @@ public class ClienteControllerTest {
     private final String NOME = "Nome";
     private final String SENHA = "123456";
     
-//    @Inject
-//    protected ClienteService clienteService;
+    @Inject
+    protected ClienteDatabaseUtil clienteDatabaseUtil;
     
     @Test
     public void testCreateClienteCpfNulo() {
@@ -69,38 +77,46 @@ public class ClienteControllerTest {
                 .body("message", is("Senha é obrigatório"));
     }
     
-//    @Test
-//    public void testCreateClienteJaExistente() {
-//        CreateClienteDTO clienteData = new CreateClienteDTO();
-//        clienteData.cpf = CPF;
-//        clienteData.nome = NOME;
-//        clienteData.senha = SENHA;
-//        
-//        clienteService.createCliente(clienteData);
-//        
-//        given()
-//            .body(clienteData)
-//            .header("Content-Type", "application/json")
-//            .when().post("/cliente")
-//            .then()
-//                .statusCode(400)
-//                .contentType(ContentType.JSON)
-//                .body("code", is(2))
-//                .body("message", is("Cliente já cadastrado"));
-//    }
+    @Test
+    public void testCreateClienteJaExistente() {
+        CreateClienteDTO clienteData = new CreateClienteDTO();
+        clienteData.cpf = CPF;
+        clienteData.nome = NOME;
+        clienteData.senha = SENHA;
+        
+        clienteDatabaseUtil.createCliente(clienteData);
+        
+        given()
+            .body(clienteData)
+            .header("Content-Type", "application/json")
+            .when().post("/cliente")
+            .then()
+                .statusCode(400)
+                .contentType(ContentType.JSON)
+                .body("code", is(2))
+                .body("message", is("Cliente já cadastrado"));
+        
+        clienteDatabaseUtil.deleteCliente(clienteData.cpf);
+    }
     
-//    @Test
-//    public void testCreateClienteSuccess() {
-//        CreateClienteDTO clienteData = new CreateClienteDTO();
-//        clienteData.cpf = CPF;
-//        clienteData.nome = NOME;
-//        clienteData.senha = SENHA;
-//        
-//        given()
-//            .body(clienteData)
-//            .header("Content-Type", "application/json")
-//            .when().post("/cliente")
-//            .then()
-//                .statusCode(204);
-//    }
+    @Test
+    @TestTransaction
+    public void testCreateClienteSuccess() {
+        CreateClienteDTO clienteData = new CreateClienteDTO();
+        clienteData.cpf = CPF;
+        clienteData.nome = NOME;
+        clienteData.senha = SENHA;
+        
+        given()
+            .body(clienteData)
+            .header("Content-Type", "application/json")
+            .when().post("/cliente")
+            .then()
+                .statusCode(204);
+        
+        Cliente clientePersistido = clienteDatabaseUtil.getCliente(clienteData.cpf);
+        assertEquals(clientePersistido.cpf, CPF);
+        assertEquals(clientePersistido.nome, NOME);
+        assertEquals(clientePersistido.senha, SENHA);
+    }
 }
