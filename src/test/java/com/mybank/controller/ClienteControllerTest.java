@@ -37,8 +37,8 @@ public class ClienteControllerTest {
             .then()
                 .statusCode(400)
                 .contentType(ContentType.JSON)
-                .body("code", is(1))
-                .body("message", is("CPF é obrigatório"));
+                .body("code", is(1),
+                        "message", is("CPF é obrigatório"));
     }
     
     @Test
@@ -53,8 +53,8 @@ public class ClienteControllerTest {
             .then()
                 .statusCode(400)
                 .contentType(ContentType.JSON)
-                .body("code", is(1))
-                .body("message", is("Nome é obrigatório"));
+                .body("code", is(1),
+                        "message", is("Nome é obrigatório"));
     }
     
     @Test
@@ -70,8 +70,8 @@ public class ClienteControllerTest {
             .then()
                 .statusCode(400)
                 .contentType(ContentType.JSON)
-                .body("code", is(1))
-                .body("message", is("Senha é obrigatório"));
+                .body("code", is(1),
+                        "message", is("Senha é obrigatório"));
     }
     
     @Test
@@ -90,8 +90,8 @@ public class ClienteControllerTest {
             .then()
                 .statusCode(400)
                 .contentType(ContentType.JSON)
-                .body("code", is(2))
-                .body("message", is("Cliente já cadastrado"));
+                .body("code", is(2),
+                        "message", is("Cliente já cadastrado"));
         
         clienteDatabaseUtil.deleteCliente(clienteData.cpf);
     }
