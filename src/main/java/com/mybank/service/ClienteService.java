@@ -5,27 +5,20 @@ import static java.time.Instant.now;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.ws.rs.core.Cookie;
-
-import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import com.mybank.dto.CreateClienteDTO;
 import com.mybank.exception.BusinessException;
 import com.mybank.exception.SecurityException;
 import com.mybank.model.Cliente;
+import com.mybank.security.SecurityConfig;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.smallrye.jwt.auth.principal.JWTParser;
-import io.smallrye.jwt.auth.principal.ParseException;
 import io.smallrye.jwt.build.Jwt;
 
 @ApplicationScoped
 public class ClienteService {
-
+    
     @Inject
-    protected JWTParser jwtParser;
-
-    private final String jwtSecret = "KiTHOH4xtiVowIBGN+XXZi0ZYwTVWXZkUDhCRtQMstU=";
+    protected SecurityConfig securityConfig;
 
     public void createCliente(CreateClienteDTO clienteData) {
         validateCreateCliente(clienteData);
@@ -62,26 +55,34 @@ public class ClienteService {
     }
 
     private String createJWTToken(String subject) {
-        return Jwt.subject(subject).expiresIn(ofDays(360)).issuedAt(now()).signWithSecret(jwtSecret);
+        return Jwt.subject(subject)
+                .claim("type", "CLT")
+                .expiresIn(ofDays(360))
+                .issuedAt(now())
+                .signWithSecret(securityConfig.jwt().key());
     }
 
-    public Cliente getClienteLoggedIn(Cookie jwt) {
-        if (jwt == null) {
-            throw new SecurityException(2, "Token de sessão não encontrado.");
-        }
-
-        try {
-
-            JsonWebToken jwtToken = jwtParser.verify(jwt.getValue(), jwtSecret);
-            PanacheEntityBase cliente = Cliente.findById(jwtToken.getSubject());
-            if (cliente != null) {
-                return (Cliente) cliente;
-            }
-
-        } catch (ParseException e) {
-            throw new SecurityException(3, "Problemas no Token de sessão.");
-        }
-
-        throw new SecurityException(4, "Usuário não logado.");
+//    public Cliente getClienteLoggedIn(Cookie jwt) {
+//        if (jwt == null) {
+//            throw new SecurityException(2, "Token de sessão não encontrado.");
+//        }
+//
+//        try {
+//
+//            JsonWebToken jwtToken = jwtParser.verify(jwt.getValue(), securityConfig.jwt().key());
+//            PanacheEntityBase cliente = Cliente.findById(jwtToken.getSubject());
+//            if (cliente != null) {
+//                return (Cliente) cliente;
+//            }
+//
+//        } catch (ParseException e) {
+//            throw new SecurityException(3, "Problemas no Token de sessão.");
+//        }
+//
+//        throw new SecurityException(4, "Usuário não logado.");
+//    }
+    
+    public Cliente getCliente(String cpf) {
+        return Cliente.findById(cpf);
     }
 }
